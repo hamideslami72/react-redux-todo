@@ -2,12 +2,12 @@ import { useState } from "react";
 import Delete from "./Delete";
 import Update from "./Update";
 import { useDispatch } from "react-redux";
-import { deleteTodo, editTodo } from "../../store/slices/todoSlice";
+import { deleteTodo, editTodo, changeChecked } from "../../store/slices/todoSlice";
 import { toast } from "react-toastify";
 
 
 
-function TodoListItem({todo, changeChecked, updateTodo}){
+function TodoListItem({todo}){
 
     const dispatch = useDispatch()
     const [editMode, setEditMode] = useState(false)
@@ -28,6 +28,11 @@ function TodoListItem({todo, changeChecked, updateTodo}){
         }
     } 
 
+    const changeCheckedHandler = ( id ) => {
+        dispatch(changeChecked(id))
+        toast.success('Success Update Todo')
+    } 
+
     return(
         <>
            {
@@ -46,7 +51,7 @@ function TodoListItem({todo, changeChecked, updateTodo}){
                     </li>
                 :   <li className="relative flex items-center justify-between px-2 py-6 border-b">
                     <div>
-                        <input type="checkbox" checked={todo?.status} onChange={() => changeChecked(todo)} className="" />
+                        <input type="checkbox" checked={todo?.status} onChange={() => changeCheckedHandler(todo.id)} className="" />
                         <p  className={`inline-block mt-1 ml-2 text-gray-600 ${todo?.status ? `line-through` : `` }`}>{todo?.title}</p>
                     </div>
                     <button type="button" className="absolute right-0 flex items-center  space-x-1">

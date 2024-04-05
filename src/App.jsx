@@ -11,10 +11,8 @@ function App() {
 
   const todos = useSelector((state) => state.todos.list)
   const dispatch = useDispatch()
-
-  const [todoListItem, setTodoListItem] = useState([])
-
   let id = todos.length
+
   const addNewTodoHandler = (todoTitle) =>{
     id += 1
     dispatch(addTodo({
@@ -24,72 +22,6 @@ function App() {
     }))
     toast.success('Success Add Todo')
   }
-
-  
-
-  const updateTodo = async (todo, newTodoTitle) => {
-      let url = `https://65f2e496105614e6549f327c.mockapi.io/todos/${todo?.id}`
-      try {
-          let res = await fetch(url, {
-              method: 'PUT',
-              headers: {'content-type':'application/json'},
-              body: JSON.stringify({title: newTodoTitle})
-          })
-
-          if (res.ok) {
-              let data = todoListItem.map((todoItem) => {
-                  if(todo.id === todoItem.id){
-                      todoItem.title = newTodoTitle
-                  }
-                  return todoItem
-              })
-              setTodoListItem({
-                  type: 'update-todo',
-                  data
-              })
-              toast.success("Success Updated.")
-          }
-
-          let message = await res.json()
-          toast.error(message)
-
-      } catch (error) {
-          toast.error(error)
-      }
-  } 
-
-  const onChangeCheckedHandler = async (todo) => {
-      let url = `https://65f2e496105614e6549f327c.mockapi.io/todos/${todo?.id}`
-      try {
-          let res = await fetch(url, {
-              method: 'PUT',
-              headers: {'content-type':'application/json'},
-              body: JSON.stringify({state: !todo.state})
-          })
-
-          if (res.ok) {
-              let data = todoListItem.map((todoItem) => {
-                  if(todo.id === todoItem.id){
-                      todoItem.state = !todoItem.state
-                  }
-                  return todoItem
-              })
-              setTodoListItem({
-                  type: 'toggle-check-todo',
-                  data
-              })
-              toast.info("Success Updated.")
-          }
-
-          let message = await res.json()
-          toast.error(message)
-
-      } catch (error) {
-          console.log(error)
-      }
-
-  }
-
 
   return (
     <>
@@ -104,9 +36,7 @@ function App() {
                     { todos.map((item) => ( 
                       <TodoListItem 
                         key={item.id} 
-                        todo={item} 
-                        changeChecked={onChangeCheckedHandler} 
-                        updateTodo={updateTodo} 
+                        todo={item}                
                       />
                     )) }
                 </ul>
