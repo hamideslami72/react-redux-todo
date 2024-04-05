@@ -9,80 +9,23 @@ import { addTodo } from './store/slices/todoSlice';
 
 function App() {
 
-  const todos = useSelector((state) => state.todos.value)
+  const todos = useSelector((state) => state.todos.list)
   const dispatch = useDispatch()
 
-  const [todoListItem, setTodoListItem] = useState([
-    {
-      "title": "title 2",
-      "status": false,
-      "id": "2"
-    },
-  ])
+  const [todoListItem, setTodoListItem] = useState([])
 
-  let id = 2
-  const addNewTodoHandler = async (todoTitle) =>{
+  let id = todos.length
+  const addNewTodoHandler = (todoTitle) =>{
+    id += 1
     dispatch(addTodo({
         id,
         title : todoTitle,
         status: false
     }))
-    id++
-      /*try {
-          let res = await fetch('https://65f2e496105614e6549f327c.mockapi.io/todos',{
-              method: 'POST',
-              headers: {'content-type':'application/json'},
-              body: JSON.stringify({
-                  title: todoTitle,
-                  state: false  
-              })
-          })
-
-          let todoData = await res.json();
-
-         
-          if(res.ok){
-              setTodoListItem([
-                ...todoListItem,
-                todoData
-              ])
-              toast.success("Success Updated.")
-          }
-
-          toast.error(todoData)
-
-      } catch (error) {
-          toast.error(error)
-      }
-      */
+    toast.success('Success Add Todo')
   }
 
-  const deleteTodo = async (todo) => {
-      let url = `https://65f2e496105614e6549f327c.mockapi.io/todos/${todo?.id}`
-      try {
-          let res = await fetch(url, {
-              method: 'DELETE',
-          })
-
-          if (res.ok) {
-              let data = todoListItem.filter( (item) => {
-                  return todo.id != item.id 
-              })
-              setTodoListItem({
-                  type: 'delete-todo',
-                  data
-              })
-              toast.success('Success Delete')
-          }
-          
-          let message = await res.json()
-          toast.error(message)
-
-      } catch (error) {
-          toast.error(error)
-      }
-      
-  }
+  
 
   const updateTodo = async (todo, newTodoTitle) => {
       let url = `https://65f2e496105614e6549f327c.mockapi.io/todos/${todo?.id}`
@@ -147,20 +90,6 @@ function App() {
 
   }
 
-  const getTodoFromApi = async () => {
-      const url = new URL('https://65f2e496105614e6549f327c.mockapi.io/todos');
-      url.searchParams.append('order', 'desc');
-      let res = await fetch(url);
-      let data = await res.json();
-      setTodoListItem([
-        ...todoListItem,
-        data
-      ])
-  }
-
-  useEffect(() => {
-      // getTodoFromApi();
-  }, [])
 
   return (
     <>
@@ -176,7 +105,6 @@ function App() {
                       <TodoListItem 
                         key={item.id} 
                         todo={item} 
-                        deleteTodo={deleteTodo} 
                         changeChecked={onChangeCheckedHandler} 
                         updateTodo={updateTodo} 
                       />

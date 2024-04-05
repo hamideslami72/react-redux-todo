@@ -1,17 +1,30 @@
 import { useState } from "react";
 import Delete from "./Delete";
 import Update from "./Update";
+import { useDispatch } from "react-redux";
+import { deleteTodo, editTodo } from "../../store/slices/todoSlice";
+import { toast } from "react-toastify";
 
 
 
-function TodoListItem({todo, deleteTodo, changeChecked, updateTodo}){
+function TodoListItem({todo, changeChecked, updateTodo}){
 
+    const dispatch = useDispatch()
     const [editMode, setEditMode] = useState(false)
+    
+    const deleteTodoHandler = (todoId) => {
+        dispatch(deleteTodo(todoId))
+        toast.success('Success Delete Todo')
+    }
 
-    const updateTodoHandler = (event, todo) => {
+    const updateTodoHandler = (event, id) => {
         if(event.key ==="Enter"){
-            updateTodo(todo, event.target.value)
-            setEditMode(false)
+        dispatch(editTodo({
+            id, 
+            title : event.target.value
+        }))
+        toast.success('Success Update Todo')
+        setEditMode(false)
         }
     } 
 
@@ -24,7 +37,7 @@ function TodoListItem({todo, deleteTodo, changeChecked, updateTodo}){
                             <input 
                                 type="text" 
                                 defaultValue={todo.title} 
-                                onKeyDown={(event) => updateTodoHandler(event , todo)}
+                                onKeyDown={(event) => updateTodoHandler(event , todo.id)}
                                 className="w-full p-2 border rounded outline-none border-grey-600"/>
                         </div>
                         <button type="button" className="absolute right-0 flex items-center  space-x-1">
@@ -33,12 +46,12 @@ function TodoListItem({todo, deleteTodo, changeChecked, updateTodo}){
                     </li>
                 :   <li className="relative flex items-center justify-between px-2 py-6 border-b">
                     <div>
-                        <input type="checkbox" checked={todo?.state} onChange={() => changeChecked(todo)} className="" />
-                        <p  className={`inline-block mt-1 ml-2 text-gray-600 ${todo?.state ? `line-through` : `` }`}>{todo?.title}</p>
+                        <input type="checkbox" checked={todo?.status} onChange={() => changeChecked(todo)} className="" />
+                        <p  className={`inline-block mt-1 ml-2 text-gray-600 ${todo?.status ? `line-through` : `` }`}>{todo?.title}</p>
                     </div>
                     <button type="button" className="absolute right-0 flex items-center  space-x-1">
                         <Update onClick={() => setEditMode(true)}/>
-                        <Delete onClick={() => deleteTodo(todo)} />
+                        <Delete onClick={() => deleteTodoHandler(todo.id)} />
                     </button> 
                 </li>
 
