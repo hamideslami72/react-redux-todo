@@ -1,26 +1,49 @@
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import CreateTodoInput from './components/todos/CreateTodoInput'
 // import TodoListApp from './components/todos/TodoListApp'
 import TodoListItem from "./components/todos/TodoListItem";
 import { toast } from 'react-toastify';
-import { addTodo } from './store/slices/todoSlice';
+import { addTodo, fetchData } from './store/slices/todoSlice';
 
 
 function App() {
 
   const todos = useSelector((state) => state.todos.list)
   const dispatch = useDispatch()
-  let id = todos.length
 
-  const addNewTodoHandler = (todoTitle) =>{
-    id += 1
-    dispatch(addTodo({
-        id,
-        title : todoTitle,
-        status: false
-    }))
-    toast.success('Success Add Todo')
+  const getTodoFromApi = async () => {
+    const url = new URL('https://65f2e496105614e6549f327c.mockapi.io/todos');
+    url.searchParams.append('order', 'desc');
+    let res = await fetch(url);
+    let data = await res.json();
+    dispatch(fetchData(data))
+  }
+
+  useEffect(() => {
+      getTodoFromApi();
+  }, [])
+
+  const addNewTodoHandler = async (todoTitle) =>{
+    try {
+      let res = await fetch('https://65f2e496105614e6549f327c.mockapi.io/todos',{
+          method: 'POST',
+          headers: {'content-type':'application/json'},
+          body: JSON.stringify({
+              title: todoTitle,
+              status: false  
+          })
+      })
+      let todoData = await res.json();
+      if(res.ok){
+          dispatch(addTodo(todoData))
+          toast.success('Success Add Todo')
+      }else{
+        toast.error(todoData)
+      }
+    } catch (error) {
+        toast.error(error)
+    }
   }
 
   return (
